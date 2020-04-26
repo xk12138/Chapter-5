@@ -4,10 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +51,28 @@ public class RegisterActivity extends AppCompatActivity {
                 }
                 // todo 做网络请求
 
+                apiService.register(name, password, repassword).enqueue(new Callback<UserResponse>() {
+                    @Override
+                    public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                        if(response.body() != null) {
+                            if(response.body().errorCode == 0) {
+                                //注册成功
+                                Toast.makeText(RegisterActivity.this, "用户" + response.body().user.nickname + "注册成功", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(RegisterActivity.this, "注册失败" + response.message(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else {
+                            Log.d("retrofit", "发送网络请求失败！");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<UserResponse> call, Throwable t) {
+                        Log.d("retrofit", t.getMessage());
+                    }
+                });
 
             }
         });
